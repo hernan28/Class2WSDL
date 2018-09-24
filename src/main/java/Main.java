@@ -7,18 +7,29 @@ public class Main {
         ClassLoader classLoader = Main.class.getClassLoader();
         Class aClass = null;
         try {
-            aClass = classLoader.loadClass("HelloWorld");
+            aClass = classLoader.loadClass(args[0]);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-//        System.out.println("aClass.getName() = " + aClass.getName());
-//
-//        for (Method method: aClass.getDeclaredMethods()) {
-//            System.out.println(method.getName());
-//        }
 
+        createDefinition(aClass);
         createComplexTypes(aClass);
         createMessages(aClass);
+        createPort(aClass);
+        createBinding(aClass);
+        createService(aClass);
+    }
+
+    public static  void createDefinition(Class aClass){
+        String definition = "<definitions name=\"ECCI_" + aClass.getName() + "\"\n";
+        definition += "             targetNamespace=\"urn:ECCI_" + aClass.getName() + "\"\n";
+        definition += "             xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\"\n";
+        definition += "             xmlns:soap=\"http://schemas.xmlsoap.org/wsdl/soap/\"\n";
+        definition += "             xmlns:tns=\"urn:ECCI_" + aClass.getName() + "\"\n";
+        definition += "             xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n";
+        definition += "             xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\"\n";
+        definition += "             xmlns=\"http://schemas.xmlsoap.org/wsdl/\">\n\n";
+        System.out.println(definition);
     }
 
     public static void createComplexTypes(Class aClass){
@@ -78,7 +89,43 @@ public class Main {
     }
 
     public static void createPort(Class aClass){
-        String port = "";
-        
+        String port = " <portType name=\"ECCI_" + aClass.getName() + "Port\">\n";
+        for(Method method: aClass.getDeclaredMethods()){
+            port += "   <operation name=\"" + method.getName() + "\">\n";
+            port += "       <input message=\"tns:" + method.getName() + "Request\" />\n";
+            port += "       <output message=\"tns:" + method.getName() + "Response\" />\n";
+            port += "   </operation>\n";
+        }
+        port += "</portType>\n";
+        System.out.println(port);
+    }
+
+    public static void createBinding(Class aClass){
+        String binding = " <binding name=\"ECCI_" + aClass.getName() + "Binding\" type=\"tns:ECCI_" + aClass.getName() + "Port\">\n" +
+                "   <soap:binding style=\"document\" transport=\"http://schemas.xmlsoap.org/soap/http\" />\n\n";
+        for(Method method: aClass.getDeclaredMethods()){
+            binding += "    <operation name=\"" + method.getName() + "\">\n";
+            binding += "        <soap:operation soapAction=\"urn:ECCI_" + aClass.getName() + "#" + aClass.getName() + "#" + method.getName() + "\" style=\"document\" />\n";
+            binding += "        <input>\n";
+            binding += "            <soap:body use=\"literal\" />\n";
+            binding += "        </input>\n";
+            binding += "        <output>\n";
+            binding += "            <soap:body use=\"literal\" />\n";
+            binding += "        </output>\n";
+            binding += "    </operation>\n";
+        }
+        binding += " </binding>\n";
+        System.out.println(binding);
+    }
+
+    public static void createService(Class aClass){
+        String service = " <service name=\"ECCI_" + aClass.getName() +"\">\n";
+        service += "    <documentation />\n";
+        service += "    <port name=\"ECCI_" + aClass.getName() + "Port\" binding=\"tns:ECCI_" + aClass.getName() + "Binding\">\n";
+        service += "        <soap:address location=\"http://localhost:8080/\" />\n";
+        service += "    </port>\n";
+        service += " </service>\n";
+        service += "</definitions>";
+        System.out.println(service);
     }
 }
