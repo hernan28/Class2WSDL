@@ -1,3 +1,5 @@
+package lala;
+
 public class HelloWorld {
 
     private String nombre;
