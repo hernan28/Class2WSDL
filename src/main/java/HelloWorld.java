@@ -1,4 +1,4 @@
-package lala;
+import lala.*;
 
 public class HelloWorld {
 
@@ -9,19 +9,19 @@ public class HelloWorld {
         this.nombre = "Mundo";
     }
 
-    public String salude(String nombre){
-        if(!nombre.equals("")){
-            this.nombre = nombre;
-        }
-        this.ultimoSaludo = "Hola " + nombre + ".";
-        return this.ultimoSaludo;
+    public String salude(Hola nombre, String lala){
+        return "hola";
     }
 
     public String servidorEstampillaDeTiempo(){
         return (new Long(System.currentTimeMillis()/1000L)).toString();
     }
 
-    public String UltimoSaludo(){
+    public String UltimoSaludo(Hola a){
         return "Saludo guardado:  " + this.ultimoSaludo;
+    }
+
+    public void prueba(){
+        return;
     }
 }
